@@ -169,12 +169,11 @@ class WebAssert
      */
     public function pageTextContains($text)
     {
-        $actual = $this->session->getPage()->getText();
-        $actual = preg_replace('/\s+/u', ' ', $actual);
-        $regex  = '/'.preg_quote($text, '/').'/ui';
+        $actual = $this->session->getPage()->getHtml();
+        $regex   = '/^\s*'.preg_quote($text, '/').'\s*$|[>"\']\s*'.preg_quote($text, '/').'\s*[<"\']/u';
 
         if (!preg_match($regex, $actual)) {
-            $message = sprintf('The text "%s" was not found anywhere in the text of the current page.', $text);
+            $message = sprintf('The exact string "%s" was not found anywhere in the html of the current page.', $text);
             throw new ResponseTextException($message, $this->session);
         }
     }
@@ -378,11 +377,11 @@ class WebAssert
     public function elementTextContains($selectorType, $selector, $text)
     {
         $element = $this->elementExists($selectorType, $selector);
-        $actual  = $element->getText();
-        $regex   = '/'.preg_quote($text, '/').'/ui';
+        $actual  = $element->getHtml();
+        $regex   = '/^\s*'.preg_quote($text, '/').'\s*$|[>"\']\s*'.preg_quote($text, '/').'\s*[<"\']/u';
 
         if (!preg_match($regex, $actual)) {
-            $message = sprintf('The text "%s" was not found in the text of the element matching %s "%s".', $text, $selectorType, $selector);
+            $message = sprintf('The exact string "%s" was not found in the html of the element matching %s "%s".', $text, $selectorType, $selector);
             throw new ElementTextException($message, $this->session, $element);
         }
     }
