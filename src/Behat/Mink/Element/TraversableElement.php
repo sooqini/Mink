@@ -219,13 +219,40 @@ abstract class TraversableElement extends Element
     {
         $field = $this->findField($locator);
 
-        if (null === $field) {
-            throw new ElementNotFoundException(
-                $this->getSession(), 'form field', 'id|name|label|value', $locator
-            );
-        }
+        if (null !== $field) {
 
-        $field->setValue($value);
+            $field->setValue($value);
+
+        } else {
+
+            $field = $this->getSession()->getPage()->find('named', array(
+                'button_label', $this->getSession()->getSelectorsHandler()->xpathLiteral($locator)
+            ));
+
+            if (null !== $field) {
+                $field = $field->getParent()->findLink($value)->getHtml();
+
+                if (null != $field) {
+
+                    $this->getSession()->executeScript("$(\"button:contains('$locator'), label:contains('$locator')\").parent().find(\"a:contains('$value')\").click();");
+
+                } else {
+
+                    throw new ElementNotFoundException(
+                        $this->getSession(), 'dropdown', 'option', $value
+                    );
+
+                }
+
+            } else {
+
+                throw new ElementNotFoundException(
+                    $this->getSession(), 'form field', 'id|name|label|value', $locator
+                );
+
+            }
+
+        }
     }
 
     /**
