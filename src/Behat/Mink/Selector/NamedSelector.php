@@ -59,6 +59,30 @@ XPATH
 XPATH
     );
 
+    public function __construct() {
+        //add label named xpath for checkField override
+        $this->registerNamedXpath("label",
+            ".//label[contains(normalize-space(string(.)), %locator%)]");
+        //add button_label named xpath for matching button via a label
+        $this->registerNamedXpath("button_label",
+            str_replace("contains(normalize-space(string(.)), %locator%)",
+                "(contains(normalize-space(string(.)), %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for)",
+                $this->translateToXPath("button"))
+        );
+        //add link_or_button_parent named xpath for matching against parent element contents
+        $this->registerNamedXpath("link_or_button_parent",
+            str_replace("contains(normalize-space(string(.)), %locator%)",
+                "contains(normalize-space(string(.)), %locator%) or contains(normalize-space(string(..)), %locator%)",
+                $this->translateToXPath("link_or_button"))
+        );
+        //add field_placeholder named xpath for partial matches in a field placeholder
+        $this->registerNamedXpath("field_placeholder",
+            str_replace("./@placeholder = %locator%",
+                "./@placeholder[contains(normalize-space(string(.)), %locator%)]",
+                $this->translateToXPath("field"))
+        );
+    }
+
     /**
      * Registers new XPath selector with specified name.
      *
