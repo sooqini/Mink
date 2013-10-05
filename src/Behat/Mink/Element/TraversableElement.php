@@ -203,9 +203,8 @@ abstract class TraversableElement extends Element
      */
     public function findField($locator)
     {
-        return $this->find('named', array(
-            'field', $this->getSession()->getSelectorsHandler()->xpathLiteral($locator)
-        ));
+        return parent::findField($locator) ?:
+            $this->find('named', array('field_placeholder', $this->getSession()->getSelectorsHandler()->xpathLiteral($locator)));
     }
 
     /**
