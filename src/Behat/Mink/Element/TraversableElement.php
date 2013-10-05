@@ -266,15 +266,17 @@ abstract class TraversableElement extends Element
      */
     public function checkField($locator)
     {
-        $field = $this->findField($locator);
+        $label = $this->find('named', array(
+            'label', $this->getSession()->getSelectorsHandler()->xpathLiteral($locator)
+        ));
 
-        if (null === $field) {
+        if (null === $label) {
             throw new ElementNotFoundException(
-                $this->getSession(), 'form field', 'id|name|label|value', $locator
+                $this->getSession(), 'label', 'id|name|label|value', $locator
             );
         }
 
-        $field->check();
+        $label->click();
     }
 
     /**
