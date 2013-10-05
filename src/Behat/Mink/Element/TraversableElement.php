@@ -141,6 +141,47 @@ abstract class TraversableElement extends Element
         $button->press();
     }
 
+    public function findButtonOrLink($locator)
+    {
+        $element = $this->find('named', array(
+            'link_or_button', $this->getSession()->getSelectorsHandler()->xpathLiteral($locator)
+        ));
+
+        if (null === $element) {
+
+            $element = $this->getSession()->getPage()->find('named', array(
+                'link_or_button_parent', $this->getSession()->getSelectorsHandler()->xpathLiteral($locator)
+            ));
+        }
+
+        return $element;
+    }
+
+    /**
+     * Presses button or follows link with specified locator.
+     *
+     * @param string $locator id, name, title, alt or value
+     *
+     * @throws ElementNotFoundException
+     */
+    public function clickLinkOrButton($locator)
+    {
+        $element = $this->findButtonOrLink($locator);
+
+        if (null === $element) {
+
+            $element = $this->getSession()->getPage()->find('xpath',
+                "//a[descendant-or-self::*[contains(normalize-space(.), {$this->getSession()->getSelectorsHandler()->xpathLiteral($locator)})]]"
+            );
+
+            throw new ElementNotFoundException(
+                $this->getSession(), 'link_or_button', 'id|name|title|alt|value', $locator
+            );
+        }
+
+        $element->click();
+    }
+
     /**
      * Checks whether document has a field (input, textarea, select) with specified locator.
      *
