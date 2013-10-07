@@ -67,7 +67,7 @@ abstract class Element implements ElementInterface
         $items = $this->findAll($selector, $locator);
 
         foreach(array_reverse($items) as $item) {
-            if($item->getParent()->isVisible()) {
+            if($item->isVisible()) {
                 return $item;
             }
         }
